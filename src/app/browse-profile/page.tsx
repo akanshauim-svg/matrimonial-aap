@@ -12,7 +12,7 @@ type User = {
   location?: string;
   profession?: string;
   bio?: string;
-  profilePic?: string;
+  imageUrl?: string;
 };
 
 export default function BrowseProfilePage() {
@@ -22,7 +22,7 @@ export default function BrowseProfilePage() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const res = await fetch("/api/browse-profiles/route");
+        const res = await fetch("/api/browse-profiles");
         const data = await res.json();
         setUsers(data.users);
       } catch (err) {
@@ -48,7 +48,7 @@ export default function BrowseProfilePage() {
         <div key={user.id} className="flex flex-col sm:flex-row bg-white rounded-2xl shadow-md overflow-hidden relative">
           <div className="relative w-full sm:w-56 h-64 sm:h-auto flex-shrink-0">
             <Image
-              src={user.profilePic || "/default-avatar.png"}
+              src={user.imageUrl || "/default-avatar.png"}
               alt={user.name}
               fill
               sizes="320px"

@@ -21,10 +21,11 @@ export default function FeaturedProfiles({ profiles }: FeaturedProfilesProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Hardcoded dropdown order
+  
   const dropdownOptions = ["All", "Frontend", "Data Science", "QA", "Backend"];
 
-  // Filter profiles based on selection
+  
+  
   const filteredProfiles =
     selectedProfession === "All"
       ? profiles
@@ -32,7 +33,8 @@ export default function FeaturedProfiles({ profiles }: FeaturedProfilesProps) {
           profile.professions.includes(selectedProfession)
         );
 
-  // Close dropdown on outside click
+  
+        
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -45,7 +47,8 @@ export default function FeaturedProfiles({ profiles }: FeaturedProfilesProps) {
 
   return (
     <section className="px-4 md:px-8 py-10 bg-gray-50">
-      {/* Heading */}
+      
+      
       <motion.div
         className="text-center mb-6"
         initial={{ opacity: 0, y: -20 }}
@@ -58,7 +61,8 @@ export default function FeaturedProfiles({ profiles }: FeaturedProfilesProps) {
         </p>
       </motion.div>
 
-      {/* Filter Dropdown */}
+      
+      
       <div className="flex justify-center mb-8 relative" ref={dropdownRef}>
         <button
           className="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-100 text-sm transition z-20 relative"
@@ -74,7 +78,8 @@ export default function FeaturedProfiles({ profiles }: FeaturedProfilesProps) {
           </motion.span>
         </button>
 
-        {/* Dropdown list */}
+        
+        
         <AnimatePresence>
           {dropdownOpen && (
             <motion.ul
@@ -102,7 +107,8 @@ export default function FeaturedProfiles({ profiles }: FeaturedProfilesProps) {
         </AnimatePresence>
       </div>
 
-      {/* Profiles Grid */}
+      
+      
       {filteredProfiles.length > 0 ? (
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"

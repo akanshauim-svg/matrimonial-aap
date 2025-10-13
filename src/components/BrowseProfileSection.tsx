@@ -7,13 +7,13 @@ interface BrowseCard {
   title: string;
   queryParam: string;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  color: string; // Icon color
+  color: string; 
 }
 
 const cards: BrowseCard[] = [
-  { title: "Age-Range", queryParam: "age", Icon: Calendar, color: "#f97316" },       // orange
-  { title: "Location", queryParam: "location", Icon: MapPin, color: "#3b82f6" }, // blue
-  { title: "Interest", queryParam: "interest", Icon: Heart, color: "#ef4444" }, // red
+  { title: "Age-Range", queryParam: "age", Icon: Calendar, color: "#f97316" },       
+  { title: "Location", queryParam: "location", Icon: MapPin, color: "#3b82f6" }, 
+  { title: "Interest", queryParam: "interest", Icon: Heart, color: "#ef4444" }, 
 ];
 
 export default function BrowseProfileSection() {

@@ -3,6 +3,9 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(_req: NextRequest) { 
   try {
     const users = await prisma.profile.findMany({
@@ -14,7 +17,7 @@ export async function GET(_req: NextRequest) {
         location: true,
         profession: true,
         bio: true,
-        imageUrl: true, // profile picture
+        imageUrl: true, 
       },
     });
 

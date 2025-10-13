@@ -64,11 +64,11 @@ export default function CreateProfilePage() {
       let imageUrl = "";
       if (selectedImage) {
 
-        // Supabase upload later
+        // supabase upload later
         imageUrl = URL.createObjectURL(selectedImage);
       }
 
-      const response = await fetch("/api/profile/create", {
+      const response = await fetch("/api/create-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, profile_image_url: imageUrl }),

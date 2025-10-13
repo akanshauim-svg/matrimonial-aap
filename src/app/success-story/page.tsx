@@ -19,7 +19,7 @@ export default function SuccessStoriesPage() {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const res = await fetch("/api/success-stories");
+        const res = await fetch("/api/success-story");
         const data = await res.json();
         setStories(data.stories || []);
       } catch (err) {

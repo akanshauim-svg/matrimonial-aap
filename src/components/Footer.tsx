@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="bg-gray-900 text-gray-300 py-10 px-6 mt-10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
 
-        {/* Left Column */}
+        
         <div>
           <h2 className="text-white text-xl font-bold flex items-center gap-2">
             DevShaadi <span className="text-pink-500">♡</span>
@@ -26,7 +26,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Quick Links */}
+       
         <div>
           <h3 className="text-white font-semibold mb-3">Quick Links</h3>
           <ul className="space-y-2 text-sm">
@@ -37,7 +37,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Support */}
+       
         <div>
           <h3 className="text-white font-semibold mb-3">Support</h3>
           <ul className="space-y-2 text-sm">
@@ -48,7 +48,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Download App */}
+        
         <div>
           <h3 className="text-white font-semibold mb-3">Download Our App</h3>
           <p className="text-sm mb-3">
@@ -60,7 +60,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Note */}
+      
+      
       <div className="text-center text-xs text-gray-400 mt-10 border-t border-gray-700 pt-4">
         © 2025 DevShaadi Clone. All rights reserved. <br />
         This is a demo project for educational purposes only. Not affiliated with the original DevShaadi.com.
