@@ -29,12 +29,12 @@ export default function LoginPage() {
         return;
       }
 
-      
+      // Save user in localStorage and context
       localStorage.setItem("currentUser", JSON.stringify(data.user));
       setUser(data.user);
 
-    
-      router.push("/browse-profile");
+      // Redirect to profile page
+      router.push("/profile");
     } catch (err) {
       console.error("Login failed", err);
       setError("Something went wrong. Please try again.");
@@ -42,10 +42,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
+    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
       <form
         onSubmit={handleLogin}
-        className="bg-white p-6 rounded-2xl shadow-lg w-96 space-y-4"
+        className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md space-y-4"
       >
         <h2 className="text-2xl font-semibold text-center text-purple-700">
           Login
@@ -81,6 +81,20 @@ export default function LoginPage() {
         >
           Login
         </button>
+
+        {/* Create Profile link */}
+        <div className="text-center mt-4">
+          <p className="text-gray-600">
+            {"Don't have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => router.push("/create-profile")}
+              className="text-blue-600 hover:underline"
+            >
+              Create Profile
+            </button>
+          </p>
+        </div>
       </form>
     </div>
   );

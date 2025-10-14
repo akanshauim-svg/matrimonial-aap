@@ -18,7 +18,7 @@ export default function Navbar() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null);
 
-  // Fetch latest user data from server on mount
+  
   useEffect(() => {
     const fetchUser = async () => {
       if (!user) return;
@@ -29,14 +29,14 @@ export default function Navbar() {
     fetchUser();
   }, [user, setUser]);
 
-  // Logout
+  
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setUser(null);
     router.push("/");
   };
 
-  // File upload
+
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
@@ -45,19 +45,18 @@ export default function Navbar() {
     }
   };
 
-  // Cropper callback
   const onCropComplete = useCallback(
     (_croppedArea: Area, croppedPixels: PixelCrop) => setCroppedAreaPixels(croppedPixels),
     []
   );
 
-  // Save cropped image → backend + localStorage
+  
   const handleSavePhoto = useCallback(async () => {
     if (imageSrc && user && croppedAreaPixels) {
       try {
         const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
 
-        // Save to backend
+        
         const res = await fetch("/api/user/update-photo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -65,7 +64,7 @@ export default function Navbar() {
         });
         const updatedUser = await res.json();
 
-        // Update frontend state + localStorage
+        
         setUser(updatedUser);
         localStorage.setItem("currentUser", JSON.stringify(updatedUser));
 
@@ -91,7 +90,7 @@ export default function Navbar() {
 
         <div className="hidden sm:flex gap-6 text-sm sm:text-base">
           <Link href="/" className="hover:text-pink-300 transition">Home</Link>
-          <Link href="/browse" className="hover:text-pink-300 transition">Browse Profile</Link>
+          <Link href="/browse-profile" className="hover:text-pink-300 transition">Browse Profile</Link>
           <Link href="/success-story" className="hover:text-pink-300 transition">Success Story</Link>
           <Link href="/about" className="hover:text-pink-300 transition">About</Link>
         </div>

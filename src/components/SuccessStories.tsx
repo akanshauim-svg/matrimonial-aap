@@ -19,15 +19,20 @@ export default function SuccessStories() {
   const [touchStartX, setTouchStartX] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // ✅ Fetch saved stories from localStorage
+  // Fetch stories from existing API
   useEffect(() => {
-    const stored = localStorage.getItem("stories"); // SAME key as used in Success Story page
-    if (stored) {
-      const parsedStories: Story[] = JSON.parse(stored);
-      if (Array.isArray(parsedStories)) {
-        setStories(parsedStories);
+    async function fetchStories() {
+      try {
+        const res = await fetch("/api/success-story");
+        if (!res.ok) throw new Error("Failed to fetch stories");
+        const data: Story[] = await res.json();
+        console.log("Fetched stories:", data);
+        setStories(data);
+      } catch (err) {
+        console.error(err);
       }
     }
+    fetchStories();
   }, []);
 
   const nextSlide = useCallback(() => {
@@ -38,15 +43,17 @@ export default function SuccessStories() {
     setCurrent((prev) => (prev === 0 ? stories.length - 1 : prev - 1));
   };
 
-  // Autoplay slider
+  
+  
   useEffect(() => {
     if (stories.length === 0) return;
     const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
   }, [stories, nextSlide]);
 
-  // Swipe handlers
-  const handleTouchStart = (e: React.TouchEvent) => setTouchStartX(e.changedTouches[0].screenX);
+  
+  const handleTouchStart = (e: React.TouchEvent) =>
+    setTouchStartX(e.changedTouches[0].screenX);
   const handleTouchEnd = (e: React.TouchEvent) => {
     const touchEndX = e.changedTouches[0].screenX;
     if (touchStartX - touchEndX > 50) nextSlide();
@@ -69,7 +76,7 @@ export default function SuccessStories() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Left Arrow */}
+        
         <button
           onClick={prevSlide}
           className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300 transition z-20"
@@ -77,12 +84,15 @@ export default function SuccessStories() {
           <FaChevronLeft />
         </button>
 
-        {/* Slider */}
+        
+
         {stories.map((story, index) => (
           <div
             key={story.id}
             className={`w-full max-w-3xl p-6 bg-white rounded-xl shadow-lg flex flex-col md:flex-row gap-6 items-center transition-opacity duration-700 absolute top-0 left-0 ${
-              index === current ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+              index === current
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0 pointer-events-none"
             }`}
           >
             <div className="w-full md:w-1/3 relative aspect-[4/3] rounded-xl overflow-hidden">
@@ -107,12 +117,14 @@ export default function SuccessStories() {
               <h3 className="font-bold text-lg">
                 {story.name} & {story.partnerName}
               </h3>
-              <p className="text-gray-500">Matched in {story.dateMet}</p>
+              <p className="text-gray-500">
+                Matched in {new Date(story.dateMet).toLocaleDateString()}
+              </p>
             </div>
           </div>
         ))}
 
-        {/* Right Arrow */}
+        
         <button
           onClick={nextSlide}
           className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300 transition z-20"

@@ -6,9 +6,14 @@ const prisma = new PrismaClient();
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const id = parseInt(params.id, 10);
-    const user = await prisma.profile.findUnique({ where: { id } });
 
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const user = await prisma.profile.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     return NextResponse.json(user);
   } catch (err) {
