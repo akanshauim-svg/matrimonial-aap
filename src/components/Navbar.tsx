@@ -12,6 +12,7 @@ export default function Navbar() {
   const router = useRouter();
   const { user, setUser } = useUser();
 
+
   const [showModal, setShowModal] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -19,22 +20,38 @@ export default function Navbar() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null);
 
   
+  
+
+
   useEffect(() => {
     const fetchUser = async () => {
-      if (!user) return;
-      const res = await fetch(`/api/user/${user.id}`);
-      const data = await res.json();
-      setUser(data);
+      if (!user) return; 
+      
+      try {
+        const res = await fetch(`/api/user/${user.id}`);
+        if (!res.ok) throw new Error("Failed to fetch user");
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        console.error("Navbar fetchUser error:", err);
+        setUser(null);
+      }
     };
     fetchUser();
   }, [user, setUser]);
 
   
+  
+
+
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setUser(null);
     router.push("/");
   };
+
+  
+  
 
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,45 +62,51 @@ export default function Navbar() {
     }
   };
 
+  
+  
+
   const onCropComplete = useCallback(
     (_croppedArea: Area, croppedPixels: PixelCrop) => setCroppedAreaPixels(croppedPixels),
     []
   );
 
   
+  
+
   const handleSavePhoto = useCallback(async () => {
-    if (imageSrc && user && croppedAreaPixels) {
-      try {
-        const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+    if (!imageSrc || !user || !croppedAreaPixels) return;
 
-        
-        const res = await fetch("/api/user/update-photo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id, profilePic: croppedImage }),
-        });
-        const updatedUser = await res.json();
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
 
-        
-        setUser(updatedUser);
-        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      const res = await fetch("/api/user/update-photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, profilePic: croppedImage }),
+      });
 
-        setShowModal(false);
-        setImageSrc(null);
-      } catch (err) {
-        console.error("Error saving cropped image:", err);
-      }
+      if (!res.ok) throw new Error("Failed to update profile pic");
+
+      const updatedUser = await res.json();
+      setUser(updatedUser);
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+
+      setShowModal(false);
+      setImageSrc(null);
+    } catch (err) {
+      console.error("Error saving cropped image:", err);
     }
   }, [imageSrc, croppedAreaPixels, user, setUser]);
 
   return (
     <>
+      
+      
+
+
       <nav className="bg-white text-black px-6 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
         <div>
-          <Link
-            href="/"
-            className="text-xl text-purple-700 font-bold hover:text-pink-300 transition"
-          >
+          <Link href="/" className="text-xl text-purple-700 font-bold hover:text-pink-300 transition">
             DevShaadi
           </Link>
         </div>
@@ -98,6 +121,8 @@ export default function Navbar() {
         <div className="flex gap-3 items-center">
           {user ? (
             <>
+              
+              
               <Link href="/profile">
                 <div className="w-8 h-8 relative rounded-full border-2 border-purple-500 hover:border-pink-300 cursor-pointer overflow-hidden">
                   <Image
@@ -126,16 +151,10 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="border border-purple-400 px-4 py-2 text-purple-700 rounded hover:bg-gray-200 transition"
-              >
+              <Link href="/login" className="border border-purple-400 px-4 py-2 text-purple-700 rounded hover:bg-gray-200 transition">
                 Login
               </Link>
-              <Link
-                href="/create-profile"
-                className="bg-pink-500 text-white px-4 py-2 rounded hover:opacity-80 transition"
-              >
+              <Link href="/create-profile" className="bg-pink-500 text-white px-4 py-2 rounded hover:opacity-80 transition">
                 Create Profile
               </Link>
             </>
@@ -143,6 +162,7 @@ export default function Navbar() {
         </div>
       </nav>
 
+      
       
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
