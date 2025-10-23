@@ -21,41 +21,42 @@ export async function POST(req: NextRequest) {
       imageUrl,
     } = body;
 
-    // Required fields validation
-    if (!name || !email || !password || !age) {
+    if (!name || !email || !age) {
       return NextResponse.json(
-        { message: "Name, Email, Password, and Age are required" },
+        { message: "Name, Email, and Age are required" },
         { status: 400 }
       );
     }
 
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    
     const skillsStr = Array.isArray(skills) ? skills.join(", ") : skills || "";
 
     let profile;
 
     if (id) {
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateData: any = {
+        name,
+        email,
+        contact: contact || "",
+        age: Number(age),
+        location: location || "",
+        profession: profession || "",
+        bio: bio || "",
+        skills: skillsStr,
+        imageUrl: imageUrl || "",
+      };
+
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
       profile = await prisma.profile.update({
         where: { id },
-        data: {
-          name,
-          email,
-          password: hashedPassword,
-          contact: contact || "",
-          age: Number(age),
-          location: location || "",
-          profession: profession || "",
-          bio: bio || "",
-          skills: skillsStr,
-          imageUrl: imageUrl || "",
-        },
+        data: updateData,
       });
     } else {
-     
+      // Check if email exists
       const existing = await prisma.profile.findUnique({ where: { email } });
       if (existing) {
         return NextResponse.json(
@@ -64,11 +65,12 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Create new profile
       profile = await prisma.profile.create({
         data: {
           name,
           email,
-          password: hashedPassword,
+          password: await bcrypt.hash(password, 10),
           contact: contact || "",
           age: Number(age),
           location: location || "",
@@ -80,10 +82,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(
-      { message: "Profile saved successfully", profile },
-      { status: 200 }
-    );
+    // Return full profile except password
+    const safeUser = {
+      id: profile.id,
+      name: profile.name,
+      email: profile.email,
+      contact: profile.contact,
+      age: profile.age,
+      location: profile.location,
+      profession: profile.profession,
+      bio: profile.bio,
+      skills: profile.skills,
+      imageUrl: profile.imageUrl || "",
+    };
+
+    return NextResponse.json({ message: "Profile saved successfully", profile: safeUser }, { status: 200 });
   } catch (err) {
     console.error("Error saving profile:", err);
     return NextResponse.json(

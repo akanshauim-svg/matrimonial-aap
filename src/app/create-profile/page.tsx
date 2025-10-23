@@ -1,8 +1,10 @@
 "use client";
-import Image from "next/image"; 
-import React from "react";
+
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useUser, User } from "../../context/UserContext";
 
 type ProfileForm = {
   name: string;
@@ -19,15 +21,16 @@ type ProfileForm = {
 };
 
 const availableSkills = [
-  "JavaScript", "React", "Node.js", "TypeScript", "Python", "Dart", 
+  "JavaScript", "React", "Node.js", "TypeScript", "Python", "Dart",
   "Next.js", "HTML5", "CSS", "Java", "Angular", "Flutter", "MySQL",
   "SpringBoot", "MongoDB", "Postgresql", ".NET", "PHP"
 ];
 
 export default function CreateProfilePage() {
   const router = useRouter();
-  const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
-  const [selectedImageName, setSelectedImageName] = React.useState("No file chosen");
+  const { setUser } = useUser();
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImageName, setSelectedImageName] = useState("No file chosen");
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<ProfileForm>({
     defaultValues: { skills: [] },
@@ -40,6 +43,7 @@ export default function CreateProfilePage() {
     try {
       let imageUrl = "";
       if (selectedImage) {
+        // just use object URL for preview, do not save locally
         imageUrl = URL.createObjectURL(selectedImage);
       }
 
@@ -48,19 +52,32 @@ export default function CreateProfilePage() {
       const response = await fetch("/api/create-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, imageUrl, skills: skillsStr }),
+        body: JSON.stringify({ ...data, skills: skillsStr, imageUrl }),
       });
 
       const result = await response.json();
 
-      if (response.ok) {
-        alert("✅ Profile created successfully!");
-        router.push("/login");
-      } else {
+      if (!response.ok) {
         alert(`❌ ${result.message}`);
+        return;
       }
-    } catch (error) {
-      console.error("Error:", error);
+
+      // ✅ Do NOT save in localStorage, just keep context (optional)
+      const newUser: User = {
+        id: result.profile.id,
+        name: result.profile.name,
+        email: result.profile.email,
+        imageUrl: result.profile.imageUrl || "",
+      };
+      setUser(newUser);
+
+      // ✅ Show confirmation dialog before redirecting
+      const goToLogin = window.confirm("✅ Profile created successfully! Do you want to go to Login?");
+      if (goToLogin) {
+        router.push("/login");
+      }
+    } catch (err) {
+      console.error("Error creating profile:", err);
       alert("Something went wrong");
     }
   };
@@ -80,205 +97,136 @@ export default function CreateProfilePage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-8">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-md rounded-2xl w-full max-w-3xl p-8"
+        className="bg-white shadow-md rounded-2xl w-full max-w-3xl p-8 space-y-4"
       >
         <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">
           Create Profile
         </h2>
 
-        <div className="space-y-4">
-          
+        {/* Name, Email, Contact, Age */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
             <input
-              {...register("name", {
-                required: "Name is required",
-                minLength: { value: 3, message: "At least 3 characters" },
-              })}
-              placeholder="Enter full name"
+              {...register("name", { required: "Name required", minLength: { value: 3, message: "Min 3 chars" } })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
           </div>
 
-          
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               {...register("email", {
-                required: "Email is required",
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter valid email" },
+                required: "Email required",
+                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email" },
               })}
-              placeholder="Enter email"
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
 
-          
           <div>
             <label className="block text-sm font-medium mb-1">Contact</label>
             <input
-              {...register("contact", {
-                required: "Contact number is required",
-                pattern: { value: /^[0-9]{10}$/, message: "Enter valid 10-digit number" },
-              })}
-              placeholder="Contact number"
+              {...register("contact", { pattern: { value: /^[0-9]{10}$/, message: "10-digit number" } })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.contact && <p className="text-red-500 text-sm mt-1">{errors.contact.message}</p>}
+            {errors.contact && <p className="text-red-500 text-sm">{errors.contact.message}</p>}
           </div>
 
-         
           <div>
             <label className="block text-sm font-medium mb-1">Age</label>
             <input
-              {...register("age", {
-                required: "Age is required",
-                pattern: { value: /^[0-9]+$/, message: "Enter a valid age" },
-              })}
-              placeholder="Enter age"
+              {...register("age", { required: "Age required", pattern: { value: /^[0-9]+$/, message: "Invalid age" } })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age.message}</p>}
+            {errors.age && <p className="text-red-500 text-sm">{errors.age.message}</p>}
           </div>
+        </div>
 
-          
+        {/* Location, Profession */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Location</label>
-            <input
-              {...register("location", { required: "Location is required" })}
-              placeholder="Enter location"
-              className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
-            />
-            {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>}
+            <input {...register("location", { required: "Location required" })} className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400" />
+            {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
           </div>
-
-       
           <div>
             <label className="block text-sm font-medium mb-1">Profession</label>
-            <input
-              {...register("profession", { required: "Profession is required" })}
-              placeholder="Enter profession"
-              className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
-            />
-            {errors.profession && (
-              <p className="text-red-500 text-sm mt-1">{errors.profession.message}</p>
-            )}
+            <input {...register("profession", { required: "Profession required" })} className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400" />
+            {errors.profession && <p className="text-red-500 text-sm">{errors.profession.message}</p>}
           </div>
+        </div>
 
-       
+        {/* Password */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               type="password"
-              {...register("password", {
-                required: "Password is required",
-                minLength: { value: 6, message: "At least 6 characters" },
-              })}
-              placeholder="Password"
+              {...register("password", { required: "Password required", minLength: { value: 6, message: "Min 6 chars" } })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
           </div>
 
-          
           <div>
             <label className="block text-sm font-medium mb-1">Confirm Password</label>
             <input
               type="password"
-              {...register("confirmPassword", {
-                required: "Please confirm your password",
-                validate: (value) => value === password || "Passwords do not match",
-              })}
-              placeholder="Confirm password"
+              {...register("confirmPassword", { validate: val => val === password || "Passwords do not match" })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-         
-          <div>
-            <label className="block text-sm font-medium mb-1">Bio</label>
-            <textarea
-              {...register("bio", { maxLength: { value: 200, message: "Max 200 characters allowed" } })}
-              placeholder="Tell us about yourself"
-              className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
-            />
-            {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>}
-          </div>
-
-          
-          <div>
-            <label className="block text-sm font-medium mb-2">Skills</label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {availableSkills.map((skill) => (
-                <label
-                  key={skill}
-                  className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-gray-50"
-                >
-                  <input
-                    type="checkbox"
-                    value={skill}
-                    {...register("skills", {
-                      validate: (val) => val.length > 0 || "Select at least one skill",
-                    })}
-                    className="w-4 h-4 accent-blue-500"
-                  />
-                  <span>{skill}</span>
-                </label>
-              ))}
-            </div>
-            {errors.skills && <p className="text-red-500 text-sm mt-1">{errors.skills.message}</p>}
-          </div>
-
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Profile Image</label>
-            {selectedImage && (
-              <div className="mb-2 relative w-32 h-32">
-                <Image
-                  src={URL.createObjectURL(selectedImage)}
-                  alt="Profile Preview"
-                  fill
-                  className="object-cover rounded-full border"
-                />
-              </div>
-            )}
-            <div className="relative border rounded-md p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <span className="text-gray-700">Choose Profile</span>
-              <span className="text-gray-500">{selectedImageName}</span>
-            </div>
+            {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full py-3 rounded-md transition-all duration-200 mt-6"
-        >
+        {/* Bio */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Bio</label>
+          <textarea {...register("bio")} className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400" />
+        </div>
+
+        {/* Skills */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Skills</label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {availableSkills.map(skill => (
+              <label key={skill} className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-gray-50">
+                <input type="checkbox" value={skill} {...register("skills")} className="w-4 h-4 accent-blue-500" />
+                <span>{skill}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Profile Image */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Profile Image</label>
+          {selectedImage && (
+            <div className="mb-2 relative w-32 h-32">
+              <Image src={URL.createObjectURL(selectedImage)} alt="Preview" fill className="object-cover rounded-full border" />
+            </div>
+          )}
+          <div className="relative border rounded-md p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <input type="file" accept="image/*" onChange={handleImageChange} className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
+            <span className="text-gray-700">Choose Profile</span>
+            <span className="text-gray-500">{selectedImageName}</span>
+          </div>
+        </div>
+
+        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full py-3 rounded-md mt-4">
           Save Profile
         </button>
 
-        <div className="text-center mt-4">
-          <p className="text-gray-600">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={() => router.push("/login")}
-              className="text-blue-600 hover:underline"
-            >
-              Login
-            </button>
-          </p>
-        </div>
+        {/* ✅ Already have account */}
+        <p className="text-center mt-4 text-sm text-gray-600">
+          Already have an account?{" "}
+          <span className="text-blue-500 cursor-pointer hover:underline" onClick={() => router.push("/login")}>
+            Login
+          </span>
+        </p>
       </form>
     </div>
   );

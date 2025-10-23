@@ -4,8 +4,20 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="bg-gradient-to-r from-pink-400 via-purple-400 to-purple-600 text-white py-20 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+    <section
+  className="relative text-white py-20 px-6"
+  style={{
+    backgroundImage: "url('/uploads/lat2.jpeg')",
+    backgroundSize: "cover",
+    backgroundPosition: "top center", 
+    backgroundRepeat: "no-repeat",
+  }}
+>
+
+      
+      <div className="absolute inset-0 bg-black/50"></div>
+
+      <div className="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
         
         <div className="flex-1">
           <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
@@ -31,7 +43,6 @@ export default function HeroSection() {
             />
           </div>
 
-          
           <div className="bg-white/20 p-4 rounded-lg inline-block">
             <h2 className="font-semibold mb-3">Quick Search:</h2>
             <div className="flex flex-wrap gap-3">
@@ -51,7 +62,7 @@ export default function HeroSection() {
 
         
         <div className="flex-1 grid grid-cols-2 gap-6">
-          {[
+          {[ 
             { number: "1000+", label: "Tech Professionals" },
             { number: "50+", label: "Success Stories" },
             { number: "98%", label: "Response Rate" },
@@ -59,7 +70,7 @@ export default function HeroSection() {
           ].map((item) => (
             <div
               key={item.label}
-              className="bg-white/20 p-6 rounded-lg text-center hover:bg-yellow-300 hover:text-black transition shadow"
+              className="bg-white/20 p-6 rounded-lg text-center hover:bg-yellow-300 hover:text-black transform hover:scale-110 transition shadow"
             >
               <h2 className="text-2xl font-bold">{item.number}</h2>
               <p className="text-sm">{item.label}</p>

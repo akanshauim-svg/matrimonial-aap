@@ -3,6 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import Image from "next/image";
+
+interface StoryResponse {
+  message?: string;
+  story?: {
+    id: number;
+    name: string;
+    partnerName: string;
+    storyText: string;
+    dateOfMatch: string;
+    imageUrl?: string;
+  };
+}
 
 export default function ShareStoryPage() {
   const router = useRouter();
@@ -17,23 +30,26 @@ export default function ShareStoryPage() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      setPreviewUrl(URL.createObjectURL(file)); 
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Max 5MB allowed");
+      return;
     }
+    setImageFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return alert("You must be logged in!");
+    if (!user?.id) return alert("User not logged in");
 
     const formData = new FormData();
     formData.append("name", form.name);
@@ -43,72 +59,41 @@ export default function ShareStoryPage() {
     formData.append("userId", user.id.toString());
     if (imageFile) formData.append("image", imageFile);
 
-    try {
-      const res = await fetch("/api/success-story", {
-        method: "POST",
-        body: formData,
-      });
+    setLoading(true);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to share story");
+    try {
+      const res = await fetch("/api/success-story", { method: "POST", body: formData });
+      const data: StoryResponse = await res.json();
+
+      if (!res.ok) {
+        alert(data?.message || "Server error");
+        return;
+      }
 
       alert("Story shared successfully!");
       router.push("/success-story");
     } catch (err) {
       console.error(err);
-      alert("Server error. Try again later.");
+      alert("Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center mt-10 px-4 sm:px-6 lg:px-0">
       <h1 className="text-3xl font-bold mb-6 text-center">Share Your Success Story</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white p-6 rounded-lg shadow-md flex flex-col gap-4"
-      >
-        <input
-          type="text"
-          name="name"
-          placeholder="Your Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
-        />
-        <input
-          type="text"
-          name="partnerName"
-          placeholder="Partner's Name"
-          value={form.partnerName}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
-        />
-        <input
-          type="date"
-          name="dateOfMatch"
-          value={form.dateOfMatch}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
-        />
-        <textarea
-          name="storyText"
-          placeholder="Write your story..."
-          value={form.storyText}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded h-32 resize-none focus:outline-none focus:ring-2 focus:ring-purple-400"
-        />
+      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-6 rounded-lg shadow-md flex flex-col gap-4">
+        <input type="text" name="name" placeholder="Your Name" value={form.name} onChange={handleChange} required className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        <input type="text" name="partnerName" placeholder="Partner's Name" value={form.partnerName} onChange={handleChange} required className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        <input type="date" name="dateOfMatch" value={form.dateOfMatch} onChange={handleChange} required className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        <textarea name="storyText" placeholder="Write your story..." value={form.storyText} onChange={handleChange} required className="border p-3 rounded h-32 resize-none focus:outline-none focus:ring-2 focus:ring-purple-400" />
 
         <div className="flex flex-col items-center gap-2">
           {previewUrl && (
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="w-32 h-32 object-cover rounded-full border mb-2"
-            />
+            <div className="relative w-32 h-32 mb-2 rounded-full overflow-hidden border">
+              <Image src={previewUrl} alt="Preview" fill style={{ objectFit: "cover" }} />
+            </div>
           )}
           <label className="w-full cursor-pointer bg-gray-100 border p-2 text-center rounded hover:bg-gray-200 transition">
             {imageFile ? "Change Image" : "Choose Image"}
@@ -116,11 +101,8 @@ export default function ShareStoryPage() {
           </label>
         </div>
 
-        <button
-          type="submit"
-          className="bg-purple-500 text-white px-6 py-3 rounded w-full hover:bg-purple-600 transition"
-        >
-          Submit Story
+        <button type="submit" disabled={loading} className={`bg-purple-500 text-white px-6 py-3 rounded w-full hover:bg-purple-600 transition ${loading ? "opacity-50 cursor-not-allowed" : ""}`}>
+          {loading ? "Submitting..." : "Submit Story"}
         </button>
       </form>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "../../context/UserContext";
+import { useUser, User } from "../../context/UserContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,11 +29,17 @@ export default function LoginPage() {
         return;
       }
 
-      // Save user in localStorage and context
-      localStorage.setItem("currentUser", JSON.stringify(data.user));
-      setUser(data.user);
+      // ✅ ensure imageUrl exists
+      const loggedInUser: User = {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        imageUrl: data.user.imageUrl || "",
+      };
 
-      // Redirect to profile page
+      localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
+      setUser(loggedInUser); // Navbar will immediately update
+
       router.push("/profile");
     } catch (err) {
       console.error("Login failed", err);
@@ -42,7 +48,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+    <div className="min-h-screen flex justify-center items-center bg-black px-4">
       <form
         onSubmit={handleLogin}
         className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md space-y-4"
@@ -82,8 +88,17 @@ export default function LoginPage() {
           Login
         </button>
 
-        {/* Create Profile link */}
-        <div className="text-center mt-4">
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => router.push("/forgot-password")}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Forgot password?
+          </button>
+        </div>
+
+        <div className="text-center mt-2">
           <p className="text-gray-600">
             {"Don't have an account?"}{" "}
             <button

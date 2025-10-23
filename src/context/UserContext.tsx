@@ -13,7 +13,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  profilePic?: string;
+  imageUrl?: string;
 }
 
 interface UserContextType {
