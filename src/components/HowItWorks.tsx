@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Users, Heart, ChevronDown, } from "lucide-react";
+import { Search, Users, Heart, ChevronDown } from "lucide-react";
+import Image from "next/image";
 
 export default function HomePage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -25,15 +26,24 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="flex flex-col w-full">
-      
-      
-        
+    <main className="flex flex-col w-full relative">
 
+      
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/uploads/wallpaper2.jpeg" 
+          alt="Background Wallpaper"
+          fill
+          className="object-cover object-center"
+          priority
+        />
+      </div>
+
+      
       <section id="how-it-works" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="text-center mb-12 px-4">
-          <h2 className="text-3xl font-bold mb-2">How DevShaadi Works</h2>
-          <p className="text-gray-600 max-w-xl mx-auto">
+        <div className="relative bg-white/30 backdrop-blur-md rounded-2xl p-6 sm:p-8 text-center mb-12">
+          <h2 className="text-3xl font-bold mb-2 text-black drop-shadow-md">How DevShaadi Works</h2>
+          <p className="text-gray-800 max-w-xl mx-auto drop-shadow-sm">
             Finding your perfect tech match is easy with our simple three-step process.
           </p>
         </div>
@@ -55,9 +65,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      
+     
       <section className="py-10 px-3 sm:px-5 lg:px-7 flex justify-center">
-        <div className="w-full sm:w-4/5 md:w-2/3 lg:w-1/2 border-2 border-gray-200 rounded-3xl bg-gray-50 p-6 sm:p-8 shadow-sm">
+        <div className="w-full sm:w-4/5 md:w-2/3 lg:w-1/2 p-6 sm:p-8 rounded-3xl bg-white/80 backdrop-blur-md shadow-sm border border-gray-200">
           <h2 className="text-2xl font-bold text-center mb-6">What are you looking for?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {accordions.map((item, index) => (

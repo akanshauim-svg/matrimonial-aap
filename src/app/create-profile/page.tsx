@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useUser, User } from "../../context/UserContext";
 
 type ProfileForm = {
   name: string;
@@ -17,7 +16,6 @@ type ProfileForm = {
   password: string;
   confirmPassword: string;
   skills: string[];
-  imageUrl?: string;
 };
 
 const availableSkills = [
@@ -28,7 +26,6 @@ const availableSkills = [
 
 export default function CreateProfilePage() {
   const router = useRouter();
-  const { setUser } = useUser();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [selectedImageName, setSelectedImageName] = useState("No file chosen");
 
@@ -41,18 +38,26 @@ export default function CreateProfilePage() {
 
   const onSubmit: SubmitHandler<ProfileForm> = async (data) => {
     try {
-      let imageUrl = "";
-      if (selectedImage) {
-        // just use object URL for preview, do not save locally
-        imageUrl = URL.createObjectURL(selectedImage);
-      }
+      const formData = new FormData();
 
-      const skillsStr = data.skills.join(", ");
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("contact", data.contact);
+      formData.append("age", data.age);
+      formData.append("location", data.location);
+      formData.append("profession", data.profession);
+      formData.append("bio", data.bio);
+      formData.append("password", data.password);
+      formData.append("confirmPassword", data.confirmPassword);
+      formData.append("skills", data.skills.join(", "));
+
+      if (selectedImage) {
+        formData.append("image", selectedImage);
+      }
 
       const response = await fetch("/api/create-profile", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, skills: skillsStr, imageUrl }),
+        body: formData, 
       });
 
       const result = await response.json();
@@ -62,23 +67,14 @@ export default function CreateProfilePage() {
         return;
       }
 
-      // ✅ Do NOT save in localStorage, just keep context (optional)
-      const newUser: User = {
-        id: result.profile.id,
-        name: result.profile.name,
-        email: result.profile.email,
-        imageUrl: result.profile.imageUrl || "",
-      };
-      setUser(newUser);
-
-      // ✅ Show confirmation dialog before redirecting
+      // ✅ Only alert and redirect, no automatic login
       const goToLogin = window.confirm("✅ Profile created successfully! Do you want to go to Login?");
       if (goToLogin) {
         router.push("/login");
       }
     } catch (err) {
       console.error("Error creating profile:", err);
-      alert("Something went wrong");
+      alert("Something went wrong while creating the profile.");
     }
   };
 
@@ -103,7 +99,7 @@ export default function CreateProfilePage() {
           Create Profile
         </h2>
 
-        {/* Name, Email, Contact, Age */}
+        {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
@@ -145,7 +141,7 @@ export default function CreateProfilePage() {
           </div>
         </div>
 
-        {/* Location, Profession */}
+        {/* More Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Location</label>
@@ -206,24 +202,40 @@ export default function CreateProfilePage() {
           <label className="block text-sm font-medium mb-1">Profile Image</label>
           {selectedImage && (
             <div className="mb-2 relative w-32 h-32">
-              <Image src={URL.createObjectURL(selectedImage)} alt="Preview" fill className="object-cover rounded-full border" />
+              <Image
+                src={URL.createObjectURL(selectedImage)}
+                alt="Preview"
+                fill
+                className="object-cover rounded-full border"
+              />
             </div>
           )}
           <div className="relative border rounded-md p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50">
-            <input type="file" accept="image/*" onChange={handleImageChange} className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+            />
             <span className="text-gray-700">Choose Profile</span>
             <span className="text-gray-500">{selectedImageName}</span>
           </div>
         </div>
 
-        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full py-3 rounded-md mt-4">
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full py-3 rounded-md mt-4"
+        >
           Save Profile
         </button>
 
-        {/* ✅ Already have account */}
+        {/* Already have account */}
         <p className="text-center mt-4 text-sm text-gray-600">
           Already have an account?{" "}
-          <span className="text-blue-500 cursor-pointer hover:underline" onClick={() => router.push("/login")}>
+          <span
+            className="text-blue-500 cursor-pointer hover:underline"
+            onClick={() => router.push("/login")}
+          >
             Login
           </span>
         </p>

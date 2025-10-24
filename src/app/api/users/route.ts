@@ -19,7 +19,16 @@ export async function GET() {
         imageUrl: true,
       },
     });
-    return NextResponse.json(users);
+
+    
+    const formattedUsers = users.map((u) => ({
+      ...u,
+      skills: u.skills
+        ? u.skills.split(",").map((s) => s.trim())
+        : [], 
+    }));
+
+    return NextResponse.json(formattedUsers);
   } catch (err) {
     console.error("Error fetching users:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

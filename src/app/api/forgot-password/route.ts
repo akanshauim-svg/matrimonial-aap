@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Simulate sending email (replace with actual email service later)
+    
     console.log(`Password reset requested for: ${email}`);
 
     return NextResponse.json({

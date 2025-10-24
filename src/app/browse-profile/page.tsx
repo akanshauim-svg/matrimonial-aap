@@ -76,7 +76,7 @@ export default function BrowseProfilePage() {
             >
              
              
-              <div className="relative w-32 h-32 flex-shrink-0">
+              <div className="relative w-32 h-32 shrink-0">
                 <Image
                   src={user.imageUrl || "/default-avatar.png"}
                   alt={user.name}

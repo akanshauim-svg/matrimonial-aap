@@ -5,15 +5,16 @@ import { Shield, Eye, MessageCircle, Car, AlertTriangle, Heart } from "lucide-re
 export default function SafetyTips() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-purple-500 to-pink-400 py-16 text-center text-white">
+      
+
+      <div className="bg-linear-to-r from-purple-500 to-pink-400 py-16 text-center text-white">
         <h1 className="text-4xl md:text-5xl font-bold mb-2">Safety Tips</h1>
         <p className="text-lg md:text-xl max-w-2xl mx-auto">
           Your safety is our top priority. Follow these guidelines for a secure and positive experience.
         </p>
       </div>
 
-      {/* Safety Cards Section */}
+     
       <div className="max-w-6xl mx-auto px-4 py-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
         <div className="flex items-start bg-white p-6 rounded-lg shadow-sm border transform transition duration-300 hover:-translate-y-2 hover:shadow-lg">
           <Shield className="text-purple-500 w-8 h-8 mr-4 mt-1" />
@@ -82,7 +83,7 @@ export default function SafetyTips() {
         </div>
       </div>
 
-      {/* Emergency Section */}
+      
       <div className="max-w-4xl mx-auto px-4 pb-16">
         <div className="bg-red-50 border border-red-300 rounded-lg p-6 flex items-start transform transition duration-300 hover:-translate-y-1 hover:shadow-lg">
           <AlertTriangle className="text-red-500 w-8 h-8 mr-4 mt-1" />

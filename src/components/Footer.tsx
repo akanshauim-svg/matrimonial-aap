@@ -86,6 +86,12 @@ export default function Footer() {
                 Privacy Policy
               </Link>
             </li>
+
+            <li>
+              <Link href={ROUTES.contact} className="hover:text-pink-500 transition-colors duration-300">
+                Contact
+              </Link>
+            </li>
           </ul>
         </div>
 

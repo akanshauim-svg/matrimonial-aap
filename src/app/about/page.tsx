@@ -10,17 +10,17 @@ export default function AboutPage() {
       <main className="flex-1">
        
 
-        <section className="bg-gradient-to-r from-purple-500 to-pink-400 text-white py-16 text-center">
+        <section className="bg-linear-to-r from-purple-500 to-pink-400 text-white py-16 text-center">
           <h1 className="text-4xl font-bold">About DevShaadi</h1>
           <p className="mt-2 text-lg">
-            Connecting tech professionals for meaningful relationships since 2022
+            Connecting tech professionals for meaningful relationships since 2025
           </p>
         </section>
 
         <section className="max-w-4xl mx-auto px-6 py-12">
           <h2 className="text-2xl font-bold mb-6">Our Story</h2>
           <p className="mb-4 text-gray-700 leading-relaxed">
-            DevShaadi was founded in 2022 by a group of tech professionals who experienced
+            DevShaadi was founded in 2025 by a group of tech professionals who experienced
             firsthand the challenges of finding partners who understand the unique lifestyle
             and interests of people in the tech industry.
           </p>

@@ -7,15 +7,15 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
 
-      {/* Header Section - full width gradient background */}
-      <div className="w-full bg-gradient-to-r from-purple-500 to-pink-400 py-20 text-center shadow-md">
+      
+      <div className="w-full bg-linear-to-r from-purple-500 to-pink-400 py-20 text-center shadow-md">
         <div className="px-4 sm:px-6">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-white">Privacy Policy</h1>
-          <p className="text-sm sm:text-base text-white">Last updated: May 10, 2025</p>
+          <p className="text-sm sm:text-base text-white">Last updated: Oct 22, 2025</p>
         </div>
       </div>
 
-      {/* Content Section */}
+      
       <div className="flex justify-center w-full mt-8 px-4 sm:px-6">
         <div className="bg-white shadow-md rounded-lg p-6 sm:p-10 max-w-4xl w-full">
           
@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
             If you do not agree with our policies and practices, please do not use our services.
           </p>
 
-          {/* Back to Home Button */}
+          
           <div className="flex justify-center mt-8">
             <Link
               href="/"

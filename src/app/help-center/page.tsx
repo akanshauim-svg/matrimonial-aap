@@ -77,7 +77,8 @@ export default function HelpCenter() {
     },
   ];
 
-  // Filter FAQs based on search input
+ 
+  
   const filteredFaqs = faqs
     .map((faq) => ({
       ...faq,
@@ -94,7 +95,7 @@ export default function HelpCenter() {
   return (
     <div className="min-h-screen bg-white">
      
-      <div className="bg-gradient-to-r from-pink-400 to-purple-500 py-12 text-center text-white px-4">
+      <div className="bg-linear-to-r from-pink-400 to-purple-500 py-12 text-center text-white px-4">
         <h1 className="text-4xl font-bold mb-2">Help Center</h1>
         <p className="text-sm sm:text-base max-w-xl mx-auto">
           Find answers to common questions and get the support you need
@@ -153,7 +154,8 @@ export default function HelpCenter() {
           </p>
         )}
 
-        {/* Contact Section */}
+       
+       
         <div className="text-center mt-12">
           <h3 className="text-xl font-semibold mb-2">Still Need Help?</h3>
           <p className="text-gray-600 mb-4">

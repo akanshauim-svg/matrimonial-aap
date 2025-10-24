@@ -1,83 +1,86 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { FaHeart, FaUsers, FaStar, FaCommentDots, FaGlobe } from "react-icons/fa";
 
 export default function HeroSection() {
+  const stats = [
+    { number: "1000+", label: "Tech Professionals", icon: <FaUsers className="w-5 h-5" /> },
+    { number: "50+", label: "Success Stories", icon: <FaStar className="w-5 h-5" /> },
+    { number: "98%", label: "Response Rate", icon: <FaCommentDots className="w-5 h-5" /> },
+    { number: "20+", label: "Countries", icon: <FaGlobe className="w-5 h-5" /> },
+  ];
+
   return (
-    <section
-  className="relative text-white py-20 px-6"
-  style={{
-    backgroundImage: "url('/uploads/lat2.jpeg')",
-    backgroundSize: "cover",
-    backgroundPosition: "top center", 
-    backgroundRepeat: "no-repeat",
-  }}
->
-
+    <section className="relative text-white">
       
-      <div className="absolute inset-0 bg-black/50"></div>
 
-      <div className="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
-        
-        <div className="flex-1">
-          <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
-            Find Your Perfect Tech Match
+      <div className="relative w-full h-[500px] sm:h-[600px] md:h-[640px]">
+        <Image
+          src="/uploads/lat7.jpeg"
+          alt="Hero Image"
+          fill
+          className="object-cover object-[10%_0%]"
+          priority
+          quality={100}
+        />
+
+        {/* Content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10">
+          <h1 className="text-5xl sm:text-6xl font-extrabold mb-3 flex items-center justify-center gap-3 text-white drop-shadow-[0_0_15px_rgba(0,0,0,0.6)]">
+            Find Your Perfect Tech Match <FaHeart className="text-red-500 animate-pulse" />
           </h1>
-          <p className="text-lg mb-8">
-            The #1 matrimony platform exclusively for developers, engineers, and
-            tech professionals. Build your future with someone who speaks your
-            language.
+          <p className="text-lg sm:text-xl mb-6 max-w-xl text-white drop-shadow-lg">
+            The #1 matrimony platform exclusively for developers, engineers, and tech professionals.
           </p>
-
-          <div className="flex gap-4 mb-8">
-            <Link
-              href="/create-profile"
-              className="bg-white text-purple-700 px-6 py-3 rounded font-semibold hover:bg-gray-200 transition"
-            >
-              Create Profile
-            </Link>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="px-4 py-3 rounded text-black w-52"
-            />
-          </div>
-
-          <div className="bg-white/20 p-4 rounded-lg inline-block">
-            <h2 className="font-semibold mb-3">Quick Search:</h2>
-            <div className="flex flex-wrap gap-3">
-              {["Frontend Developer", "Backend Developer", "Quality Assurance","Data Scientist", "DevOps", "Full Stack"].map(
-                (role) => (
-                  <span
-                    key={role}
-                    className="bg-white/30 px-3 py-1 rounded-full text-sm hover:bg-yellow-300 hover:text-black cursor-pointer transition"
-                  >
-                    {role}
-                  </span>
-                )
-              )}
-            </div>
-          </div>
+          <Link
+            href="/create-profile"
+            className="bg-purple-700 hover:bg-purple-800 text-white px-12 sm:px-16 py-3 rounded-lg font-semibold text-lg sm:text-xl shadow-lg transition transform hover:scale-105"
+          >
+            Find Your Match
+          </Link>
         </div>
 
-        
-        <div className="flex-1 grid grid-cols-2 gap-6">
-          {[ 
-            { number: "1000+", label: "Tech Professionals" },
-            { number: "50+", label: "Success Stories" },
-            { number: "98%", label: "Response Rate" },
-            { number: "20+", label: "Countries" },
-          ].map((item) => (
+        {/*  Stats Strip */}
+        <div className="absolute bottom-0 left-0 w-full bg-black/70 py-3 px-4 flex flex-wrap justify-around items-center gap-4 rounded-t-xl">
+          {stats.map((item, index) => (
             <div
               key={item.label}
-              className="bg-white/20 p-6 rounded-lg text-center hover:bg-yellow-300 hover:text-black transform hover:scale-110 transition shadow"
+              className="flex flex-col items-center justify-center text-white cursor-pointer flex-1 min-w-[70px] sm:min-w-[90px] opacity-0 animate-fade-up"
+              style={{ animationDelay: `${index * 0.2}s`, animationFillMode: "forwards" }}
             >
-              <h2 className="text-2xl font-bold">{item.number}</h2>
-              <p className="text-sm">{item.label}</p>
+              <div className="flex items-center gap-1 mb-1 text-white">
+                {item.icon}
+                <span className="font-semibold text-lg sm:text-xl">{item.number}</span>
+              </div>
+              <p className="text-xs sm:text-sm text-white text-center">{item.label}</p>
             </div>
           ))}
         </div>
       </div>
+
+      {/*  Heading & Stats Animation */}
+      <style jsx>{`
+        h1 {
+          background: linear-gradient(90deg, #ffffff, #fffbcc, #ffffff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shine 2s infinite;
+        }
+        @keyframes shine {
+          0% { background-position: -200px; }
+          100% { background-position: 200px; }
+        }
+
+        @keyframes fadeUp {
+          0% { opacity: 0; transform: translateY(20px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+          animation: fadeUp 0.6s ease forwards;
+        }
+      `}</style>
     </section>
   );
 }

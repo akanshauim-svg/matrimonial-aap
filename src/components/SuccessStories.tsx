@@ -1,136 +1,111 @@
 "use client";
-
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Link from "next/link";
 
-export type Story = {
-  id: string | number;
+type Story = {
+  id: number;
   name: string;
   partnerName: string;
-  story: string;
-  dateMet: string;
-  image?: string;
+  storyText: string;
+  dateOfMatch: string;
+  imageUrl?: string;
 };
 
 export default function SuccessStories() {
   const [stories, setStories] = useState<Story[]>([]);
   const [current, setCurrent] = useState(0);
-  const [touchStartX, setTouchStartX] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch stories from existing API
-  useEffect(() => {
-    async function fetchStories() {
-      try {
-        const res = await fetch("/api/success-story");
-        if (!res.ok) throw new Error("Failed to fetch stories");
-        const data: Story[] = await res.json();
-        console.log("Fetched stories:", data);
-        setStories(data);
-      } catch (err) {
-        console.error(err);
-      }
+  const fetchStories = useCallback(async () => {
+    try {
+      const res = await fetch("/api/success-story");
+      if (!res.ok) throw new Error("Failed to fetch stories");
+      const data: Story[] = await res.json();
+      setStories(data);
+    } catch (err) {
+      console.error("Error fetching stories:", err);
     }
-    fetchStories();
   }, []);
 
-  const nextSlide = useCallback(() => {
-    setCurrent((prev) => (prev === stories.length - 1 ? 0 : prev + 1));
-  }, [stories.length]);
-
-  const prevSlide = () => {
-    setCurrent((prev) => (prev === 0 ? stories.length - 1 : prev - 1));
-  };
-
-  
-  
   useEffect(() => {
-    if (stories.length === 0) return;
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
-  }, [stories, nextSlide]);
+    fetchStories();
+  }, [fetchStories]);
 
-  
-  const handleTouchStart = (e: React.TouchEvent) =>
-    setTouchStartX(e.changedTouches[0].screenX);
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const touchEndX = e.changedTouches[0].screenX;
-    if (touchStartX - touchEndX > 50) nextSlide();
-    else if (touchStartX - touchEndX < -50) prevSlide();
-  };
+  const prevSlide = () =>
+    setCurrent((prev) => (prev === 0 ? stories.length - 1 : prev - 1));
+  const nextSlide = () =>
+    setCurrent((prev) => (prev === stories.length - 1 ? 0 : prev + 1));
 
-  if (stories.length === 0)
-    return <p className="text-center mt-12 text-gray-500">No success stories yet!</p>;
+  if (!stories.length)
+    return (
+      <p className="text-center mt-12 text-gray-500">
+        No success stories yet!
+      </p>
+    );
 
   return (
-    <section className="py-12 bg-white">
-      <h2 className="text-3xl font-bold text-center mb-2">Success Stories</h2>
-      <p className="text-center text-gray-500 mb-8">
-        Real couples who found their perfect match ❤️
-      </p>
+    <section className="py-8 bg-[#faf8ff]">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-6 px-6">
+        {/* Left Side */}
+        <div className="flex-1 md:flex-[0.4] text-left">
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-1">
+            Success Stories
+          </h2>
+          <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4">
+            Celebrate love that found its way through our platform. Read inspiring stories of couples who turned their matches into lifelong journeys.
+          </p>
 
-      <div
-        className="relative flex items-center justify-center overflow-hidden"
-        ref={containerRef}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        
-        <button
-          onClick={prevSlide}
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300 transition z-20"
-        >
-          <FaChevronLeft />
-        </button>
+          {/* Read More Button */}
+          <div className="flex justify-center md:justify-start mt-2">
+            <Link
+              href="/success-story"
+              className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition flex items-center gap-2 text-sm md:text-base"
+            >
+              Read More <FaChevronRight />
+            </Link>
+          </div>
+        </div>
 
-        
+        {/* Right Side - Single Story with Arrows */}
+        <div className="flex-[0.65] relative w-full">
+          <div className="relative w-full h-60 md:h-[280px] rounded-2xl overflow-hidden shadow-lg">
+            <Image
+              src={stories[current].imageUrl || "/default-avatar.png"}
+              alt={`${stories[current].name} & ${stories[current].partnerName}`}
+              fill
+              style={{ objectFit: "cover" }}
+              unoptimized
+            />
 
-        {stories.map((story, index) => (
-          <div
-            key={story.id}
-            className={`w-full max-w-3xl p-6 bg-white rounded-xl shadow-lg flex flex-col md:flex-row gap-6 items-center transition-opacity duration-700 absolute top-0 left-0 ${
-              index === current
-                ? "opacity-100 z-10"
-                : "opacity-0 z-0 pointer-events-none"
-            }`}
-          >
-            <div className="w-full md:w-1/3 relative aspect-[4/3] rounded-xl overflow-hidden">
-              {story.image ? (
-                <Image
-                  src={story.image}
-                  alt={`${story.name} & ${story.partnerName}`}
-                  fill
-                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div className="bg-purple-100 text-purple-600 w-full h-full flex items-center justify-center">
-                  <span className="text-4xl font-bold">
-                    {story.name.charAt(0)}&{story.partnerName.charAt(0)}
-                  </span>
-                </div>
-              )}
-            </div>
+            {/* Left/Right Arrows */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition z-20"
+            >
+              <FaChevronLeft size={18} />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition z-20"
+            >
+              <FaChevronRight size={18} />
+            </button>
 
-            <div className="flex-1 text-center md:text-left mt-4 md:mt-0">
-              <p className="italic text-gray-700 mb-2">&quot;{story.story}&quot;</p>
-              <h3 className="font-bold text-lg">
-                {story.name} & {story.partnerName}
+            {/* Overlay Text */}
+            <div className="absolute bottom-0 left-0 right-0 bg-black/30 p-3 text-white text-xs md:text-sm">
+              <p className="italic mb-1 text-sm md:text-base">
+                &quot;{stories[current].storyText}&quot;
+              </p>
+              <h3 className="font-semibold text-sm md:text-lg">
+                {stories[current].name} & {stories[current].partnerName}
               </h3>
-              <p className="text-gray-500">
-                Matched in {new Date(story.dateMet).toLocaleDateString()}
+              <p className="text-[10px] md:text-xs">
+                {new Date(stories[current].dateOfMatch).toLocaleDateString()}
               </p>
             </div>
           </div>
-        ))}
-
-        
-        <button
-          onClick={nextSlide}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow hover:bg-gray-300 transition z-20"
-        >
-          <FaChevronRight />
-        </button>
+        </div>
       </div>
     </section>
   );

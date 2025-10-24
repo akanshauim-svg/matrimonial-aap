@@ -60,11 +60,11 @@ export default function Navbar() {
             <Link href={ROUTES.profile}>
               <div className="w-10 h-10 relative rounded-full border-2 border-purple-500 hover:border-black cursor-pointer overflow-hidden">
                 <Image
-                  src={user.imageUrl || "/default-avatar.png"} 
+                  src={user.imageUrl && user.imageUrl !== "" ? user.imageUrl : "/default-avatar.png"}
                   alt="Profile"
                   fill
                   style={{ objectFit: "cover" }}
-                  unoptimized 
+                  unoptimized
                 />
               </div>
             </Link>
