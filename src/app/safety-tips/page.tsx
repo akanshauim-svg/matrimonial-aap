@@ -2,6 +2,10 @@
 
 import { Shield, Eye, MessageCircle, Car, AlertTriangle, Heart } from "lucide-react";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
+
+
 export default function SafetyTips() {
   return (
     <div className="min-h-screen bg-gray-50">

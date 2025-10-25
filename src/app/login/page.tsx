@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, User } from "../../context/UserContext";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

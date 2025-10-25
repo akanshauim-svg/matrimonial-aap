@@ -5,6 +5,9 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Heart } from "lucide-react";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
+
 interface Profile {
   id: number;
   name: string;

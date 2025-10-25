@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import Image from "next/image";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
 interface StoryResponse {
   message?: string;
   story?: {

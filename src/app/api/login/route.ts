@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../../lib/supabaseClient'
+
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {

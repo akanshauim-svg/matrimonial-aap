@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useUser } from "../../context/UserContext";
 import { FiEdit, FiSave, FiX } from "react-icons/fi";
 import { FaWhatsapp, FaFacebookF, FaInstagram, FaEnvelope, FaEnvelopeOpenText, FaPhone } from "react-icons/fa";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
 
 type UserProfile = {
   id: number;

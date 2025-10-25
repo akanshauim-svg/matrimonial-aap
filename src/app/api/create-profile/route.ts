@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../../lib/supabaseClient'
+
 
 const prisma = new PrismaClient();
 
@@ -21,6 +24,8 @@ export async function POST(req: NextRequest) {
     const bio = formData.get("bio") as string;
     const skills = formData.get("skills") as string;
     const file = formData.get("image") as File | null;
+
+
 
     if (!name || !email || !age) {
       return NextResponse.json(

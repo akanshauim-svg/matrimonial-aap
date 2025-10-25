@@ -1,13 +1,15 @@
 "use client";
 
 import { Mail, Phone, MapPin } from "lucide-react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
      
      
-      <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center py-12">
+      <div className="bg-linear-to-r from-pink-500 to-purple-500 text-white text-center py-12">
         <h1 className="text-3xl md:text-4xl font-bold">Contact Us</h1>
         <p className="mt-2 text-sm md:text-base">
           Have questions or feedback? We&apos;d love to hear from you.

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../lib/supabaseClient'
 interface Story {
   id: number;
   name: string;
@@ -42,11 +44,11 @@ export default function SuccessStoriesPage() {
       {visibleStories.map((story) => (
         <div key={story.id} className="bg-white p-6 rounded-xl shadow-md flex flex-col sm:flex-row gap-4">
           {story.imageUrl ? (
-            <div className="w-32 h-32 relative flex-shrink-0 rounded-full overflow-hidden">
+            <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden">
               <Image src={story.imageUrl} alt="Couple" fill className="object-cover" />
             </div>
           ) : (
-            <div className="w-32 h-32 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 text-2xl flex-shrink-0">
+            <div className="w-32 h-32 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 text-2xl shrink-0">
               {story.name.charAt(0)}&{story.partnerName.charAt(0)}
             </div>
           )}

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { supabase } from '../../../lib/supabaseClient'
 
 const prisma = new PrismaClient();
 const uploadDir = path.join(process.cwd(), "public/uploads");

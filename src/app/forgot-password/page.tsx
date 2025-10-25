@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+ import { supabase } from '../../lib/supabaseClient'
 
+ 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
