@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { supabase } from '../../../../lib/supabaseClient'
+import { supabase } from "../../../../lib/supabaseClient";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  context: { params: { id: string } }
+) {
   try {
-    const id = parseInt(params.id, 10);
+    const id = parseInt(context.params.id, 10);
 
     const user = await prisma.profile.findUnique({
       where: { id },
@@ -21,6 +23,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json(user);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Server error", details: err instanceof Error ? err.message : err },
+      { status: 500 }
+    );
   }
 }
