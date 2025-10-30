@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(context.params.id, 10);
+    const id = parseInt(params.id, 10);
 
     const user = await prisma.profile.findUnique({
       where: { id },
@@ -22,7 +22,7 @@ export async function GET(
 
     return NextResponse.json(user);
   } catch (err) {
-    console.error(err);
+    console.error("Error in GET /api/user/[id]:", err);
     return NextResponse.json(
       { error: "Server error", details: err instanceof Error ? err.message : err },
       { status: 500 }
