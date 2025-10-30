@@ -25,8 +25,10 @@ export default function SuccessStoriesPage() {
     const fetchStories = async () => {
       try {
         const res = await fetch("/api/success-story");
-        const data: Story[] = await res.json();
-        setStories(data);
+const data = await res.json();
+setStories(Array.isArray(data) ? data : []);
+
+
       } catch (err) {
         console.error(err);
       }
@@ -36,7 +38,9 @@ export default function SuccessStoriesPage() {
 
   const visibleStories = showAll ? stories : stories.slice(0, MAX_VISIBLE);
 
-  if (!stories.length) return <p className="text-center mt-12 text-gray-500">No success stories yet!</p>;
+  {stories.length === 0 ? (
+  <p className="text-center mt-12 text-gray-500">No success stories yet!</p>
+) : null}
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">

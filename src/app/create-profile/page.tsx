@@ -69,7 +69,7 @@ export default function CreateProfilePage() {
         return;
       }
 
-      // ✅ Only alert and redirect, no automatic login
+      //  no automatic login
       const goToLogin = window.confirm("✅ Profile created successfully! Do you want to go to Login?");
       if (goToLogin) {
         router.push("/login");
