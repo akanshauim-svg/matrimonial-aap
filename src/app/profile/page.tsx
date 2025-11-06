@@ -32,7 +32,7 @@ export default function ProfilePage() {
   const [tempProfile, setTempProfile] = useState<UserProfile | null>(null);
   const [editMode, setEditMode] = useState(false);
 
-  // Fetch profile from backend
+  
   useEffect(() => {
     if (!user?.id) return;
 

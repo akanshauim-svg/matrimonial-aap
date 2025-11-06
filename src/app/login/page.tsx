@@ -32,7 +32,7 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ ensure imageUrl exists
+      //  imageUrl exists
       const loggedInUser: User = {
         id: data.user.id,
         name: data.user.name,
@@ -41,7 +41,7 @@ export default function LoginPage() {
       };
 
       localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
-      setUser(loggedInUser); // Navbar will immediately update
+      setUser(loggedInUser); 
 
       router.push("/profile");
     } catch (err) {

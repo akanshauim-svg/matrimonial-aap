@@ -10,7 +10,7 @@ import CallAction from "../components/CallAction";
 
 
 export default function HomePage() {
-  const [profilesFromStorage, setProfilesFromStorage] = useState<Profile[]>([]);
+  const [, setProfilesFromStorage] = useState<Profile[]>([]);
 
   useEffect(() => {
     const storedProfiles = localStorage.getItem("profiles");
@@ -36,7 +36,7 @@ export default function HomePage() {
         <HowItWorks />
       </section>
       
-       <FeaturedProfiles profiles={profilesFromStorage} />
+       <FeaturedProfiles  />
        <BrowseProfileSection />
        <SuccessStories/>
        <CallAction/>

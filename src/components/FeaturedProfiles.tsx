@@ -5,7 +5,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Profile {
+export interface Profile {
   id: number;
   name: string;
   age: number;
