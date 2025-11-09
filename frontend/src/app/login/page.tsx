@@ -4,9 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, User } from "../../context/UserContext";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { supabase } from "../../lib/supabaseClient";
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,18 +16,16 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3002/api/auth/login", {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
+
+      const res = await fetch(`${baseUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Invalid credentials");
-        return;
-      }
 
       //  imageUrl exists
       const loggedInUser: User = {

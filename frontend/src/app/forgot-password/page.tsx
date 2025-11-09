@@ -2,24 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
- import { supabase } from '../../lib/supabaseClient'
 
- 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
+    setLoading(true);
 
     try {
-      
-      const res = await fetch("/api/forgot-password", {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
+      const res = await fetch(`${baseUrl}/api/user/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -29,6 +29,7 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         setError(data.message || "Something went wrong");
+        setLoading(false);
         return;
       }
 
@@ -37,6 +38,8 @@ export default function ForgotPasswordPage() {
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,10 +54,14 @@ export default function ForgotPasswordPage() {
         </h2>
 
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-        {message && <p className="text-green-500 text-sm text-center">{message}</p>}
+        {message && (
+          <p className="text-green-500 text-sm text-center">{message}</p>
+        )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Email
+          </label>
           <input
             type="email"
             value={email}
@@ -66,9 +73,14 @@ export default function ForgotPasswordPage() {
 
         <button
           type="submit"
-          className="w-full bg-purple-700 text-white py-2 rounded-md hover:bg-purple-800 transition"
+          disabled={loading}
+          className={`w-full py-2 rounded-md text-white transition ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-purple-700 hover:bg-purple-800"
+          }`}
         >
-          Send Reset Link
+          {loading ? "Sending..." : "Send Reset Link"}
         </button>
 
         <div className="text-center mt-4">

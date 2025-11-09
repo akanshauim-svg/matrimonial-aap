@@ -22,22 +22,45 @@ export default function FeaturedProfiles() {
   const [showFilter, setShowFilter] = useState(false);
   const [professions, setProfessions] = useState<string[]>(["All"]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const visibleCount = 4;
 
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const res = await fetch("/api/users");
+        setLoading(true);
+        const baseUrl =
+          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
+        const res = await fetch(`${baseUrl}/api/user/all-users`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP Error ${res.status}`);
+        }
+
         const data = await res.json();
         const profilesArray = Array.isArray(data) ? data : [];
+
         setProfiles(profilesArray);
         setFiltered(profilesArray);
+
         const uniqueProfs = Array.from(
           new Set(profilesArray.map((p) => p.profession || "Unknown"))
         );
         setProfessions(["All", ...uniqueProfs]);
-      } catch (err) {
-        console.error("Error fetching profiles:", err);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching profiles:", err);
+          setError("Failed to load profiles. Please try again later.");
+        } else {
+          console.error("Error fetching profiles:", err);
+          setError("Failed to load profiles. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
     fetchProfiles();
@@ -61,6 +84,22 @@ export default function FeaturedProfiles() {
     }
   };
 
+  if (loading) {
+    return (
+      <section className="w-full py-10 text-center text-gray-600">
+        Loading featured profiles...
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="w-full py-10 text-center text-red-500">
+        {error}
+      </section>
+    );
+  }
+
   return (
     <section className="w-full bg-[#fdfaf5] py-8 sm:py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -70,7 +109,8 @@ export default function FeaturedProfiles() {
             Featured Profiles
           </h2>
           <p className="text-gray-600 mt-2 text-sm sm:text-base">
-            Meet our most popular tech professionals. All profiles are verified and ready to connect.
+            Meet our most popular professionals. All profiles are verified and
+            ready to connect.
           </p>
         </div>
 
@@ -106,7 +146,6 @@ export default function FeaturedProfiles() {
 
         {/* Carousel Container */}
         <div className="relative overflow-hidden">
-          {/* Left Arrow */}
           {currentIndex > 0 && (
             <button
               onClick={prev}
@@ -116,7 +155,6 @@ export default function FeaturedProfiles() {
             </button>
           )}
 
-          {/* Right Arrow */}
           {currentIndex + visibleCount < filtered.length && (
             <button
               onClick={next}
@@ -126,7 +164,6 @@ export default function FeaturedProfiles() {
             </button>
           )}
 
-          {/* Sliding Profiles */}
           <motion.div
             className="flex gap-6 sm:gap-8 mx-auto"
             style={{ maxWidth: "90%" }}

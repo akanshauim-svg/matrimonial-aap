@@ -3,10 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { supabase } from "../../lib/supabaseClient";
-
 interface Story {
   id: number;
   name: string;
@@ -21,17 +17,19 @@ export default function SuccessStoriesPage() {
   const [showAll, setShowAll] = useState(false);
   const router = useRouter();
   const MAX_VISIBLE = 3;
-
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const res = await fetch("/api/success-story");
+        const baseUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
+        const res = await fetch(`${baseUrl}/api/stories`);
         const data = await res.json();
         setStories(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching stories:", err);
       }
     };
+
     fetchStories();
   }, []);
 
@@ -42,7 +40,9 @@ export default function SuccessStoriesPage() {
       <h1 className="text-3xl font-bold text-center mb-6">Success Stories</h1>
 
       {stories.length === 0 ? (
-        <p className="text-center mt-12 text-gray-500">No success stories yet!</p>
+        <p className="text-center mt-12 text-gray-500">
+          No success stories yet!
+        </p>
       ) : (
         visibleStories.map((story) => (
           <div
@@ -68,8 +68,7 @@ export default function SuccessStoriesPage() {
                 {story.name} & {story.partnerName}
               </h2>
               <p className="text-gray-500 text-sm mb-2">
-                Matched in{" "}
-                {new Date(story.dateOfMatch).toLocaleDateString()}
+                Matched in {new Date(story.dateOfMatch).toLocaleDateString()}
               </p>
               <p className="text-gray-700">{story.storyText}</p>
             </div>

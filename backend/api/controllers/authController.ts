@@ -6,8 +6,10 @@ const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import fs from "fs";
+import path from "path";
+import { Request, Response } from "express";
 
-export const register = async (req, res) => {
+export const register = async (req: Request, res: Response) => {
   try {
     const {
       id,
@@ -21,7 +23,7 @@ export const register = async (req, res) => {
       bio,
       skills,
     } = req.body;
-    const file = req.file; // from multer
+    const file = req.file; 
 
     if (!name || !email || !password) {
       return res
@@ -42,7 +44,6 @@ export const register = async (req, res) => {
       imageUrl = `/uploads/${fileName}`;
     }
 
-    // Convert skills to array (Prisma expects String[])
     let skillsArray = [];
     if (skills) {
       if (Array.isArray(skills)) {
@@ -58,8 +59,7 @@ export const register = async (req, res) => {
     let profile;
 
     if (id) {
-      // Update existing profile
-      const updateData = {
+      const updateData: any = {
         name,
         email,
         contact,
@@ -78,7 +78,6 @@ export const register = async (req, res) => {
         data: updateData,
       });
     } else {
-      // Check for existing email
       const existing = await prisma.profile.findUnique({ where: { email } });
       if (existing) {
         return res.status(400).json({ message: "Email already registered" });
@@ -101,18 +100,18 @@ export const register = async (req, res) => {
       });
     }
 
-    // Remove password before sending response
     const { password: _, ...safeUser } = profile;
     res
       .status(200)
       .json({ message: "User saved successfully", user: safeUser });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Register error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ message: "Server error", error: message });
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -127,7 +126,6 @@ export const login = async (req, res) => {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) return res.status(401).json({ message: "Invalid password" });
 
-    // Optional: create JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET || "secret",
@@ -140,13 +138,25 @@ export const login = async (req, res) => {
     res
       .status(200)
       .json({ message: "Login successful", user: safeUser, token });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ message: "Server error", error: message });
   }
 };
 
-export const forgotPassword = async (req, res) => {
+export const logout = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ message: "Server error", error: message });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
@@ -155,12 +165,12 @@ export const forgotPassword = async (req, res) => {
     const user = await prisma.profile.findUnique({ where: { email } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // You can send email or Supabase reset here
     console.log(`Password reset requested for ${email}`);
 
     res.status(200).json({ message: "Password reset link sent to your email" });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Forgot password error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ message: "Server error", error: message });
   }
 };

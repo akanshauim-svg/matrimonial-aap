@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Story = {
   id: number;
@@ -16,17 +17,20 @@ type Story = {
 export default function SuccessStories() {
   const [stories, setStories] = useState<Story[]>([]);
   const [current, setCurrent] = useState(0);
+  const router = useRouter();
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
 
   const fetchStories = useCallback(async () => {
     try {
-      const res = await fetch("/api/success-story");
-      if (!res.ok) throw new Error("Failed to fetch stories");
-      const data: Story[] = await res.json();
-      setStories(data);
+      const res = await fetch(`${baseUrl}/api/stories`);
+      if (!res.ok) throw new Error(`Failed to fetch stories`);
+      const data = await res.json();
+      setStories(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching stories:", err);
     }
-  }, []);
+  }, [baseUrl]);
 
   useEffect(() => {
     fetchStories();
@@ -34,14 +38,13 @@ export default function SuccessStories() {
 
   const prevSlide = () =>
     setCurrent((prev) => (prev === 0 ? stories.length - 1 : prev - 1));
+
   const nextSlide = () =>
     setCurrent((prev) => (prev === stories.length - 1 ? 0 : prev + 1));
 
   if (!stories.length)
     return (
-      <p className="text-center mt-12 text-gray-500">
-        No success stories yet!
-      </p>
+      <p className="text-center mt-12 text-gray-500">No success stories yet!</p>
     );
 
   return (
@@ -53,10 +56,11 @@ export default function SuccessStories() {
             Success Stories
           </h2>
           <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4">
-            Celebrate love that found its way through our platform. Read inspiring stories of couples who turned their matches into lifelong journeys.
+            Celebrate love that found its way through our platform. Read
+            inspiring stories of couples who turned their matches into lifelong
+            journeys.
           </p>
 
-          {/* Read More Button */}
           <div className="flex justify-center md:justify-start mt-2">
             <Link
               href="/success-story"
@@ -67,7 +71,7 @@ export default function SuccessStories() {
           </div>
         </div>
 
-        {/* Right Side - Single Story with Arrows */}
+        {/* Right Side */}
         <div className="flex-[0.65] relative w-full">
           <div className="relative w-full h-60 md:h-[280px] rounded-2xl overflow-hidden shadow-lg">
             <Image

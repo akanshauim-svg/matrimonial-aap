@@ -1,9 +1,10 @@
 import pkg from "@prisma/client";
+import type { Request, Response } from "express";
 const { PrismaClient } = pkg;
 
 const prisma = new PrismaClient();
 
-export const updateUserPhoto = async (req, res) => {
+export const updateUserPhoto = async (req: Request, res: Response) => {
   try {
     const { userId, imageUrl } = req.body;
 

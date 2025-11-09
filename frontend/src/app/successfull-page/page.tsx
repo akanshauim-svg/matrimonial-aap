@@ -1,8 +1,4 @@
 import Link from "next/link";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { supabase } from '../../lib/supabaseClient'
-
 export default function SuccessPage() {
   return (
     <div className="pt-24 flex flex-col items-center text-center px-4">

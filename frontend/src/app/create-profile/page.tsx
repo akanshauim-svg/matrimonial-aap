@@ -19,9 +19,24 @@ type ProfileForm = {
 };
 
 const availableSkills = [
-  "JavaScript", "React", "Node.js", "TypeScript", "Python", "Dart",
-  "Next.js", "HTML5", "CSS", "Java", "Angular", "Flutter", "MySQL",
-  "SpringBoot", "MongoDB", "Postgresql", ".NET", "PHP"
+  "JavaScript",
+  "React",
+  "Node.js",
+  "TypeScript",
+  "Python",
+  "Dart",
+  "Next.js",
+  "HTML5",
+  "CSS",
+  "Java",
+  "Angular",
+  "Flutter",
+  "MySQL",
+  "SpringBoot",
+  "MongoDB",
+  "Postgresql",
+  ".NET",
+  "PHP",
 ];
 
 export default function CreateProfilePage() {
@@ -29,7 +44,12 @@ export default function CreateProfilePage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [selectedImageName, setSelectedImageName] = useState("No file chosen");
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<ProfileForm>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ProfileForm>({
     defaultValues: { skills: [] },
     mode: "onBlur",
   });
@@ -54,12 +74,17 @@ export default function CreateProfilePage() {
       if (selectedImage) {
         formData.append("image", selectedImage);
       }
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
 
-      const response = await fetch("http://localhost:3002/api/auth/register", {
+      const response = await fetch(`${baseUrl}/api/auth/register`, {
         method: "POST",
         body: formData,
       });
-
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed");
+      }
 
       const result = await response.json();
 
@@ -69,7 +94,9 @@ export default function CreateProfilePage() {
       }
 
       //  no automatic login
-      const goToLogin = window.confirm("Profile created successfully! Do you want to go to Login?");
+      const goToLogin = window.confirm(
+        "Profile created successfully! Do you want to go to Login?"
+      );
       if (goToLogin) {
         router.push("/login");
       }
@@ -105,10 +132,15 @@ export default function CreateProfilePage() {
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
             <input
-              {...register("name", { required: "Name required", minLength: { value: 3, message: "Min 3 chars" } })}
+              {...register("name", {
+                required: "Name required",
+                minLength: { value: 3, message: "Min 3 chars" },
+              })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
           </div>
 
           <div>
@@ -116,29 +148,43 @@ export default function CreateProfilePage() {
             <input
               {...register("email", {
                 required: "Email required",
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email" },
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email",
+                },
               })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Contact</label>
             <input
-              {...register("contact", { pattern: { value: /^[0-9]{10}$/, message: "10-digit number" } })}
+              {...register("contact", {
+                pattern: { value: /^[0-9]{10}$/, message: "10-digit number" },
+              })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.contact && <p className="text-red-500 text-sm">{errors.contact.message}</p>}
+            {errors.contact && (
+              <p className="text-red-500 text-sm">{errors.contact.message}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Age</label>
             <input
-              {...register("age", { required: "Age required", pattern: { value: /^[0-9]+$/, message: "Invalid age" } })}
+              {...register("age", {
+                required: "Age required",
+                pattern: { value: /^[0-9]+$/, message: "Invalid age" },
+              })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.age && <p className="text-red-500 text-sm">{errors.age.message}</p>}
+            {errors.age && (
+              <p className="text-red-500 text-sm">{errors.age.message}</p>
+            )}
           </div>
         </div>
 
@@ -146,13 +192,25 @@ export default function CreateProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Location</label>
-            <input {...register("location", { required: "Location required" })} className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400" />
-            {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
+            <input
+              {...register("location", { required: "Location required" })}
+              className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+            {errors.location && (
+              <p className="text-red-500 text-sm">{errors.location.message}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Profession</label>
-            <input {...register("profession", { required: "Profession required" })} className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400" />
-            {errors.profession && <p className="text-red-500 text-sm">{errors.profession.message}</p>}
+            <input
+              {...register("profession", { required: "Profession required" })}
+              className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+            {errors.profession && (
+              <p className="text-red-500 text-sm">
+                {errors.profession.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -162,36 +220,60 @@ export default function CreateProfilePage() {
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               type="password"
-              {...register("password", { required: "Password required", minLength: { value: 6, message: "Min 6 chars" } })}
+              {...register("password", {
+                required: "Password required",
+                minLength: { value: 6, message: "Min 6 chars" },
+              })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Confirm Password</label>
+            <label className="block text-sm font-medium mb-1">
+              Confirm Password
+            </label>
             <input
               type="password"
-              {...register("confirmPassword", { validate: val => val === password || "Passwords do not match" })}
+              {...register("confirmPassword", {
+                validate: (val) => val === password || "Passwords do not match",
+              })}
               className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
             />
-            {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm">
+                {errors.confirmPassword.message}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Bio */}
         <div>
           <label className="block text-sm font-medium mb-1">Bio</label>
-          <textarea {...register("bio")} className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400" />
+          <textarea
+            {...register("bio")}
+            className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400"
+          />
         </div>
 
         {/* Skills */}
         <div>
           <label className="block text-sm font-medium mb-2">Skills</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {availableSkills.map(skill => (
-              <label key={skill} className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-gray-50">
-                <input type="checkbox" value={skill} {...register("skills")} className="w-4 h-4 accent-blue-500" />
+            {availableSkills.map((skill) => (
+              <label
+                key={skill}
+                className="flex items-center space-x-2 border rounded-md p-2 cursor-pointer hover:bg-gray-50"
+              >
+                <input
+                  type="checkbox"
+                  value={skill}
+                  {...register("skills")}
+                  className="w-4 h-4 accent-blue-500"
+                />
                 <span>{skill}</span>
               </label>
             ))}
@@ -200,7 +282,9 @@ export default function CreateProfilePage() {
 
         {/* Profile Image */}
         <div>
-          <label className="block text-sm font-medium mb-1">Profile Image</label>
+          <label className="block text-sm font-medium mb-1">
+            Profile Image
+          </label>
           {selectedImage && (
             <div className="mb-2 relative w-32 h-32">
               <Image

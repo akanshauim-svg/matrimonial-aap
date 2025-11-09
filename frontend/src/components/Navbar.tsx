@@ -20,16 +20,33 @@ export default function Navbar() {
   const router = useRouter();
   const { user, setUser } = useUser();
   const [showMenu, setShowMenu] = useState(false);
+  const handleLogout = async () => {
+    try {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
 
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setUser(null);
-    router.push(ROUTES.home);
+      const res = await fetch(`${baseUrl}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error("Logout failed:", data.message || res.statusText);
+      }
+
+      // Clear local data and redirect
+      localStorage.removeItem("currentUser");
+      setUser(null);
+      router.push(ROUTES.home);
+    } catch (err) {
+      console.error("Error logging out:", err);
+    }
   };
 
   return (
     <nav className="bg-white text-black px-8 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
-      
       <div>
         <Link
           href={ROUTES.home}
@@ -41,16 +58,28 @@ export default function Navbar() {
 
       {/* Desktop Menu */}
       <div className="hidden sm:flex gap-6 font-bold text-sm sm:text-base">
-        <Link href={ROUTES.home} className="hover:underline hover:text-black transition">
+        <Link
+          href={ROUTES.home}
+          className="hover:underline hover:text-black transition"
+        >
           Home
         </Link>
-        <Link href={ROUTES.browseProfile} className="hover:underline hover:text-black transition">
+        <Link
+          href={ROUTES.browseProfile}
+          className="hover:underline hover:text-black transition"
+        >
           Browse Profile
         </Link>
-        <Link href={ROUTES.successStory} className="hover:underline hover:text-black transition">
+        <Link
+          href={ROUTES.successStory}
+          className="hover:underline hover:text-black transition"
+        >
           Success Story
         </Link>
-        <Link href={ROUTES.about} className="hover:underline hover:text-black transition">
+        <Link
+          href={ROUTES.about}
+          className="hover:underline hover:text-black transition"
+        >
           About
         </Link>
       </div>
@@ -62,7 +91,11 @@ export default function Navbar() {
             <Link href={ROUTES.profile}>
               <div className="w-10 h-10 relative rounded-full border-2 border-purple-500 hover:border-black cursor-pointer overflow-hidden">
                 <Image
-                  src={user.imageUrl && user.imageUrl !== "" ? user.imageUrl : "/default-avatar.png"}
+                  src={
+                    user.imageUrl && user.imageUrl !== ""
+                      ? user.imageUrl
+                      : "/default-avatar.png"
+                  }
                   alt="Profile"
                   fill
                   style={{ objectFit: "cover" }}
@@ -101,26 +134,70 @@ export default function Navbar() {
         onClick={() => setShowMenu(!showMenu)}
         className="sm:hidden flex flex-col justify-center items-center w-8 h-8 border border-gray-400 rounded-md"
       >
-        <div className={`h-0.5 w-5 bg-black transition-all ${showMenu ? "rotate-45 translate-y-1.5" : ""}`} />
-        <div className={`h-0.5 w-5 bg-black my-1 transition-all ${showMenu ? "opacity-0" : ""}`} />
-        <div className={`h-0.5 w-5 bg-black transition-all ${showMenu ? "-rotate-45 -translate-y-1.5" : ""}`} />
+        <div
+          className={`h-0.5 w-5 bg-black transition-all ${
+            showMenu ? "rotate-45 translate-y-1.5" : ""
+          }`}
+        />
+        <div
+          className={`h-0.5 w-5 bg-black my-1 transition-all ${
+            showMenu ? "opacity-0" : ""
+          }`}
+        />
+        <div
+          className={`h-0.5 w-5 bg-black transition-all ${
+            showMenu ? "-rotate-45 -translate-y-1.5" : ""
+          }`}
+        />
       </button>
 
       {/* Mobile Menu */}
       {showMenu && (
         <div className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center py-6 gap-4 sm:hidden font-semibold text-base z-40">
-          <Link href={ROUTES.home} onClick={() => setShowMenu(false)} className="hover:text-purple-700">Home</Link>
-          <Link href={ROUTES.browseProfile} onClick={() => setShowMenu(false)} className="hover:text-purple-700">Browse Profile</Link>
-          <Link href={ROUTES.successStory} onClick={() => setShowMenu(false)} className="hover:text-purple-700">Success Story</Link>
-          <Link href={ROUTES.about} onClick={() => setShowMenu(false)} className="hover:text-purple-700">About</Link>
+          <Link
+            href={ROUTES.home}
+            onClick={() => setShowMenu(false)}
+            className="hover:text-purple-700"
+          >
+            Home
+          </Link>
+          <Link
+            href={ROUTES.browseProfile}
+            onClick={() => setShowMenu(false)}
+            className="hover:text-purple-700"
+          >
+            Browse Profile
+          </Link>
+          <Link
+            href={ROUTES.successStory}
+            onClick={() => setShowMenu(false)}
+            className="hover:text-purple-700"
+          >
+            Success Story
+          </Link>
+          <Link
+            href={ROUTES.about}
+            onClick={() => setShowMenu(false)}
+            className="hover:text-purple-700"
+          >
+            About
+          </Link>
 
           <div className="flex flex-col items-center gap-3 mt-4">
             {user ? (
               <>
-                <Link href={ROUTES.profile} onClick={() => setShowMenu(false)} className="flex items-center gap-2">
+                <Link
+                  href={ROUTES.profile}
+                  onClick={() => setShowMenu(false)}
+                  className="flex items-center gap-2"
+                >
                   <div className="w-8 h-8 relative rounded-full border border-purple-500 overflow-hidden">
                     <Image
-                      src={user.imageUrl && user.imageUrl !== "" ? user.imageUrl : "/default-avatar.png"}
+                      src={
+                        user.imageUrl && user.imageUrl !== ""
+                          ? user.imageUrl
+                          : "/default-avatar.png"
+                      }
                       alt="Profile"
                       fill
                       style={{ objectFit: "cover" }}
