@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                  // Modern JS target for Node.js
+    "module": "NodeNext",                // ESM support for Node.js
+    "moduleResolution": "NodeNext",      // Correct resolution for imports
+    "esModuleInterop": true,             // Allows default import from CommonJS
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                      // Strict type checking
+    "skipLibCheck": true,                // Skip type checking for dependencies
+    "outDir": "./dist",                  // Compiled JS output
+    "rootDir": "./",                     // Source root
+    "resolveJsonModule": true,           // Allow import of JSON
+    "sourceMap": true,                   // Generate sourcemaps
+    "declaration": true,                 // Generate declaration files
+    "declarationMap": true               // Generate declaration sourcemaps
+  },
+  "include": ["server.ts", "api/**/*.ts", "db/**/*.ts"]
+}
