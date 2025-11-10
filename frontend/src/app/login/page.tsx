@@ -27,7 +27,16 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      //  imageUrl exists
+      if (!res.ok) {
+        setError(data.message || "Login failed");
+        return;
+      }
+
+      if (!data.user) {
+        setError("Invalid response from server");
+        return;
+      }
+
       const loggedInUser: User = {
         id: data.user.id,
         name: data.user.name,
@@ -35,6 +44,7 @@ export default function LoginPage() {
         imageUrl: data.user.imageUrl || "",
       };
 
+      localStorage.setItem("authToken", data.token);
       localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
       setUser(loggedInUser);
 

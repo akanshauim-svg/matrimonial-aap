@@ -8,11 +8,11 @@ import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 import { Request, Response } from "express";
+import { saveUploadedFile } from "../utils/uploadFile";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const {
-      id,
       name,
       email,
       password,
@@ -23,7 +23,6 @@ export const register = async (req: Request, res: Response) => {
       bio,
       skills,
     } = req.body;
-    const file = req.file; 
 
     if (!name || !email || !password) {
       return res
@@ -31,20 +30,16 @@ export const register = async (req: Request, res: Response) => {
         .json({ message: "Name, Email, and Password are required" });
     }
 
-    // Handle image upload
-    let imageUrl = "";
-    if (file) {
-      const uploadsDir = path.join(process.cwd(), "public", "uploads");
-      if (!fs.existsSync(uploadsDir))
-        fs.mkdirSync(uploadsDir, { recursive: true });
-
-      const fileName = `${Date.now()}-${file.originalname}`;
-      const filePath = path.join(uploadsDir, fileName);
-      fs.writeFileSync(filePath, file.buffer);
-      imageUrl = `/uploads/${fileName}`;
+    const existing = await prisma.profile.findUnique({ where: { email } });
+    if (existing) {
+      return res.status(400).json({ message: "Email already registered" });
     }
+    const file = req.file;
+    const tempUserId = Date.now(); 
+    const imageUrl = file ? saveUploadedFile(file, tempUserId) : "";
 
-    let skillsArray = [];
+    // Process skills
+    let skillsArray: string[] = [];
     if (skills) {
       if (Array.isArray(skills)) {
         skillsArray = skills;
@@ -56,54 +51,26 @@ export const register = async (req: Request, res: Response) => {
       }
     }
 
-    let profile;
-
-    if (id) {
-      const updateData: any = {
+    // Create new user
+    const profile = await prisma.profile.create({
+      data: {
         name,
         email,
+        password: await bcrypt.hash(password, 10),
         contact,
         age: age ? Number(age) : null,
         location,
         profession,
         bio,
         skills: skillsArray,
-      };
-
-      if (password) updateData.password = await bcrypt.hash(password, 10);
-      if (imageUrl) updateData.imageUrl = imageUrl;
-
-      profile = await prisma.profile.update({
-        where: { id: Number(id) },
-        data: updateData,
-      });
-    } else {
-      const existing = await prisma.profile.findUnique({ where: { email } });
-      if (existing) {
-        return res.status(400).json({ message: "Email already registered" });
-      }
-
-      // Create new profile
-      profile = await prisma.profile.create({
-        data: {
-          name,
-          email,
-          password: await bcrypt.hash(password, 10),
-          contact,
-          age: age ? Number(age) : null,
-          location,
-          profession,
-          bio,
-          skills: skillsArray,
-          imageUrl,
-        },
-      });
-    }
+        imageUrl,
+      },
+    });
 
     const { password: _, ...safeUser } = profile;
     res
       .status(200)
-      .json({ message: "User saved successfully", user: safeUser });
+      .json({ message: "User registered successfully", user: safeUser });
   } catch (error: unknown) {
     console.error("Register error:", error);
     const message = error instanceof Error ? error.message : String(error);
