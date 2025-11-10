@@ -51,59 +51,51 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
+
+  const handleChange = <K extends keyof UserProfile>(key: K, value: UserProfile[K]) => {
+    if (!tempProfile) return;
+    setTempProfile({ ...tempProfile, [key]: value } as UserProfile);
+  };
+
+  // Fetch user profile
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.log("No user id yet");
+      return;
+    }
 
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
         const res = await fetch(`${baseUrl}/api/user/${user.id}`);
         if (!res.ok) throw new Error("Failed to fetch user data");
 
         const data = await res.json();
-        const skillsArray = data.user.skills
+        const skillsArray = Array.isArray(data.skills)
+          ? data.skills
+          : typeof data.skills === "string"
           ? data.skills.split(",").map((s: string) => s.trim())
           : [];
 
-        setProfile({ ...data.user, skills: skillsArray });
+        setProfile({ ...data, skills: skillsArray });
         setTempProfile({ ...data, skills: skillsArray });
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching profile:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user]);
-
-  return (
-    <div className="text-center mt-10 text-lg text-gray-600">Loading...</div>
-  );
-
-  if (!profile)
-    return (
-      <div className="text-center mt-10 text-gray-600">No profile found.</div>
-    );
-
-  const handleChange = <K extends keyof UserProfile>(
-    field: K,
-    value: UserProfile[K]
-  ) => {
-    if (!tempProfile) return;
-    setTempProfile({ ...tempProfile, [field]: value });
-  };
+  }, [user?.id, baseUrl]);
 
   const handleSave = async () => {
     if (!tempProfile) return;
     setLoading(true);
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
-      const res = await fetch(`${baseUrl}/api/user/${user?.id}`, {
-        method: "POST",
+      const res = await fetch(`${baseUrl}/api/user/update/${user?.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(tempProfile),
       });
@@ -133,46 +125,47 @@ export default function ProfilePage() {
     setTempProfile(profile);
     setEditMode(false);
   };
-
-  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!tempProfile || !e.target.files?.[0]) return;
+  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0] || !user?.id) return;
     const file = e.target.files[0];
-    const reader = new FileReader();
 
-    reader.onload = async () => {
-      const base64 = reader.result as string;
-      setTempProfile({ ...tempProfile, imageUrl: base64 });
+    const formData = new FormData();
+    formData.append("userId", String(user.id));
+    formData.append("image", file);
 
-      setLoading(true);
-      try {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
-        const res = await fetch(`${baseUrl}/api/user-photo`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: tempProfile.id, imageUrl: base64 }),
-        });
-        if (!res.ok) throw new Error("Failed to save avatar");
+    try {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
+      const res = await fetch(`${baseUrl}/api/user/upload-photo/${user.id}`, {
+        method: "POST",
+        body: formData,
+      });
 
-        const updated = await res.json();
-        setProfile((prev) =>
-          prev ? { ...prev, imageUrl: updated.imageUrl } : prev
-        );
-      } catch (err) {
-        console.error(err);
-        alert(
-          "Error saving avatar: " + (err instanceof Error ? err.message : "")
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-    reader.readAsDataURL(file);
+      if (!res.ok) throw new Error("Failed to upload photo");
+      const updated = await res.json();
+
+      setProfile((prev) =>
+        prev ? { ...prev, imageUrl: updated.imageUrl } : prev
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading image");
+    }
   };
+
+  if (loading) {
+    return <div className="text-center mt-10 text-gray-600">Loading...</div>;
+  }
+
+  if (!profile) {
+    return (
+      <div className="text-center mt-10 text-gray-600">Profile not found.</div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6 flex flex-col md:flex-row gap-8 mt-8">
-      {/* Left section */}
+      {/* LEFT SECTION */}
       <div className="flex flex-col items-center md:items-start md:w-1/3">
         <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-gray-300 relative mb-4">
           <Image
@@ -204,7 +197,7 @@ export default function ProfilePage() {
             <FaEnvelopeOpenText /> <span>{tempProfile?.email}</span>
           </div>
           <div className="flex items-center gap-2">
-            <FaPhone />{" "}
+            <FaPhone />
             <input
               type="text"
               value={tempProfile?.contact || ""}
@@ -292,7 +285,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Right section */}
+      {/* RIGHT SECTION */}
       <div className="flex-1 mt-4 md:mt-0 grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm text-gray-500 mb-1">Name</label>

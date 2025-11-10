@@ -17,7 +17,6 @@ type Story = {
 export default function SuccessStories() {
   const [stories, setStories] = useState<Story[]>([]);
   const [current, setCurrent] = useState(0);
-  const router = useRouter();
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
 

@@ -19,14 +19,18 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use("/uploads", express.static("uploads"));
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running successfully!");
 });
-
-app.use("/uploads", express.static("public/uploads"));
 
 // Routes
 app.use("/api/auth", authRoutes);
